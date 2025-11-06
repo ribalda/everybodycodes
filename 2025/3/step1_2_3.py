@@ -1,4 +1,5 @@
 import sys
+from collections import Counter
 
 
 def part1(nums):
@@ -11,13 +12,7 @@ def part2(nums):
 
 
 def part3(nums):
-    i = 0
-    while nums:
-        i += 1
-        uniq = set(nums)
-        for u in uniq:
-            nums.remove(u)
-    return i
+    return max(Counter(nums).values())
 
 
 nums = list(map(int, sys.stdin.readline().split(",")))
