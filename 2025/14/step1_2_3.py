@@ -1,19 +1,4 @@
 import sys
-from functools import cache
-
-
-def print_world(world):
-    first = int(min([x.real for x in world.keys()]))
-    for x in range(first, 100):
-        if complex(x, 0) not in world:
-            break
-        line = ""
-        for y in range(first, 100):
-            if complex(x, y) not in world:
-                break
-            line += world[complex(x, y)]
-        print(line)
-    print()
 
 
 def get_world(lines):
@@ -56,48 +41,24 @@ def n_on(world, steps):
     return out
 
 
-def empty_world(first, last, on=frozenset()):
+def empty_world(first, last):
     out = dict()
     for i in range(first, last + 1):
         for j in range(first, last + 1):
-            if complex(i, j) in on:
-                out[complex(i, j)] = "#"
-            else:
-                out[complex(i, j)] = "."
-    return out
-
-
-@cache
-def step_min_max(on, min, max):
-    world = empty_world(min, max, on)
-    world = step(world)
-    return frozenset([w for w in world.keys() if world[w] == "#"])
-
-
-def n_pattern(min, max, pattern, steps):
-    world = empty_world(min, max)
-    out = 0
-    for i in range(steps):
-        world = step(world)
-        for p in pattern:
-            if pattern[p] != world[p]:
-                break
-        else:
-            out += len([w for w in world.keys() if world[w] == "#"])
+            out[complex(i, j)] = "."
     return out
 
 
 def n_pattern_cycle(min, max, pattern, steps):
-    on = frozenset()
+    world = empty_world(min, max)
     out = 0
     visited = dict()
     partial_out = dict()
     for i in range(steps):
-        on = step_min_max(on, min, max)
+        world = step(world)
+        on = frozenset([w for w in world.keys() if world[w] == "#"])
         for p in pattern:
-            if pattern[p] == "#" and p not in on:
-                break
-            if pattern[p] == "." and p in on:
+            if pattern[p] != world[p]:
                 break
         else:
             out += len(on)
@@ -111,8 +72,7 @@ def n_pattern_cycle(min, max, pattern, steps):
             left = missing_steps % cycle_size
             out += partial_out[visited[on] + left] - partial_out[visited[on]]
             return out
-        else:
-            visited[on] = i
+        visited[on] = i
     return out
 
 
